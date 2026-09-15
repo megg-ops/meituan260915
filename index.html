@@ -3,647 +3,121 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>周末出发 WeekendGO · 周末城市探索指南</title>
-<style>
-:root{
-  --primary:#FF7A00; --primary2:#FFB800; --grad:linear-gradient(135deg,#FF7A00,#FFB800);
-  --ink:#1F2329; --sub:#6B7280; --line:#ECEEF1; --bg:#F6F7F9; --card:#fff;
-  --green:#10B981; --blue:#3B82F6; --purple:#8B5CF6; --red:#F43F5E;
-  --r:16px; --shadow:0 4px 20px rgba(31,35,41,.06);
-}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;background:#E9EBEE;color:var(--ink);font-size:15px;line-height:1.5}
-#app{max-width:430px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;box-shadow:0 0 40px rgba(0,0,0,.08);display:flex;flex-direction:column}
-/* ---------- header ---------- */
-header{background:var(--grad);color:#fff;padding:14px 16px 12px;position:sticky;top:0;z-index:50;border-radius:0 0 20px 20px}
-.h-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:19px;letter-spacing:.5px}
-.logo .go{background:rgba(255,255,255,.22);border-radius:8px;padding:0 6px;font-size:13px;font-weight:700}
-.city-btn{background:rgba(255,255,255,.2);border:none;color:#fff;font-size:13px;padding:5px 10px;border-radius:20px;display:flex;align-items:center;gap:4px;cursor:pointer}
-.weather-bar{margin-top:10px;background:rgba(255,255,255,.16);border-radius:12px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px}
-.w-main{display:flex;align-items:center;gap:6px;font-weight:600;font-size:13.5px}
-.w-sim{display:flex;gap:4px}
-.w-sim button{border:none;background:rgba(255,255,255,.2);color:#fff;font-size:11px;padding:3px 8px;border-radius:12px;cursor:pointer;transition:.2s}
-.w-sim button.on{background:#fff;color:var(--primary);font-weight:700}
-.w-sim button:hover{background:rgba(255,255,255,.35)}
-/* ---------- preference panel ---------- */
-.pref{margin:12px 12px 0;background:var(--card);border-radius:var(--r);padding:12px 14px;box-shadow:var(--shadow)}
-.pref-title{font-size:12px;color:var(--sub);font-weight:600;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
-.chips{display:flex;flex-wrap:wrap;gap:7px}
-.chip{border:1px solid var(--line);background:#fff;border-radius:20px;padding:4px 12px;font-size:12.5px;cursor:pointer;transition:.15s;color:var(--sub)}
-.chip.on{background:#FFF3E0;border-color:var(--primary);color:var(--primary);font-weight:600}
-.budget-row{display:flex;align-items:center;gap:10px;margin-top:4px}
-input[type=range]{flex:1;accent-color:var(--primary)}
-.budget-val{font-size:13px;font-weight:700;color:var(--primary);min-width:64px;text-align:right}
-.row2{display:flex;gap:12px}
-.row2>div{flex:1}
-/* ---------- main / tabs ---------- */
-main{flex:1;padding-bottom:76px}
-.page{display:none;padding:12px;animation:fadein .25s}
-.page.on{display:block}
-@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.sec-head{display:flex;align-items:center;justify-content:space-between;margin:4px 2px 10px}
-.sec-head h2{font-size:16.5px;font-weight:800}
-.sec-head .more{font-size:12px;color:var(--sub);cursor:pointer}
-/* ---------- activity cards ---------- */
-.act-card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden;cursor:pointer;transition:transform .15s}
-.act-card:active{transform:scale(.985)}
-.act-top{display:flex;gap:12px;padding:12px 12px 8px}
-.cover{width:76px;height:76px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0}
-.act-info{flex:1;min-width:0}
-.cat-badge{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:6px;margin-bottom:3px;color:#fff}
-.act-title{font-size:15.5px;font-weight:700;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.act-meta{font-size:12px;color:var(--sub);display:flex;flex-direction:column;gap:1px}
-.match-pill{position:absolute;right:12px;top:12px}
-.act-card{position:relative}
-.match-pill{background:#FFF3E0;color:var(--primary);font-size:11px;font-weight:800;padding:2px 8px;border-radius:10px}
-.reasons{display:flex;flex-wrap:wrap;gap:5px;padding:0 12px 10px}
-.reason{font-size:11px;padding:2px 8px;border-radius:8px;background:#F3F4F6;color:var(--sub)}
-.reason.good{background:#ECFDF5;color:var(--green)}
-.reason.warn{background:#FEF2F2;color:var(--red)}
-.act-foot{display:flex;border-top:1px solid var(--line)}
-.act-foot button{flex:1;border:none;background:none;padding:9px 0;font-size:13px;font-weight:600;color:var(--sub);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px}
-.act-foot button:hover{background:#FAFAFB}
-.act-foot button.primary{color:var(--primary)}
-.act-foot button+button{border-left:1px solid var(--line)}
-.empty{text-align:center;color:var(--sub);padding:40px 0;font-size:13.5px}
-.empty .big{font-size:40px;display:block;margin-bottom:8px}
-/* ---------- team cards ---------- */
-.team-card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:14px;margin-bottom:12px}
-.team-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
-.team-title{font-weight:700;font-size:15px}
-.team-sub{font-size:12px;color:var(--sub);margin-top:2px}
-.slots{font-size:12px;font-weight:700;color:var(--blue);background:#EFF6FF;padding:2px 9px;border-radius:10px;flex-shrink:0}
-.slots.full{color:var(--sub);background:#F3F4F6}
-.team-info{font-size:12.5px;color:var(--sub);display:flex;flex-direction:column;gap:3px;margin:8px 0 10px}
-.avatars{display:flex;align-items:center;margin-top:8px}
-.avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;border:2px solid #fff;margin-left:-6px}
-.avatar:first-child{margin-left:0}
-.avatar.ghost{background:#F3F4F6;color:#C4C9D0;border-style:dashed}
-.join-btn{background:var(--grad);color:#fff;border:none;border-radius:20px;padding:7px 18px;font-size:13px;font-weight:700;cursor:pointer;float:right}
-.join-btn:disabled{background:#E5E7EB;color:#9CA3AF;cursor:not-allowed}
-.join-btn.joined{background:#ECFDF5;color:var(--green)}
-.fab{position:fixed;bottom:86px;right:calc(50% - 215px + 14px);width:52px;height:52px;border-radius:50%;background:var(--grad);color:#fff;border:none;font-size:26px;box-shadow:0 6px 18px rgba(255,122,0,.4);cursor:pointer;z-index:40;display:flex;align-items:center;justify-content:center}
-@media(max-width:430px){.fab{right:14px}}
-/* ---------- checkin ---------- */
-.stats{display:flex;gap:10px;margin-bottom:14px}
-.stat{flex:1;background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:12px 8px;text-align:center}
-.stat .num{font-size:20px;font-weight:800;color:var(--primary)}
-.stat .lbl{font-size:11px;color:var(--sub);margin-top:2px}
-.tl-item{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:12px 14px;margin-bottom:10px;display:flex;gap:12px}
-.tl-emoji{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.tl-body{flex:1;min-width:0}
-.tl-title{font-weight:700;font-size:14px}
-.tl-note{font-size:13px;color:var(--ink);margin:3px 0}
-.tl-time{font-size:11px;color:var(--sub)}
-.mood{font-size:16px;margin-right:4px}
-/* ---------- guides ---------- */
-.guide-card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:14px;margin-bottom:12px;cursor:pointer}
-.g-title{font-weight:700;font-size:15px;margin-bottom:4px}
-.g-excerpt{font-size:12.5px;color:var(--sub);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.g-foot{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:11.5px;color:var(--sub)}
-.g-like{border:none;background:#FFF1F2;color:var(--red);font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:12px;cursor:pointer}
-.g-tags{display:flex;gap:5px;margin-top:6px}
-.g-tag{font-size:10.5px;background:#F3F4F6;color:var(--sub);padding:1px 8px;border-radius:8px}
-/* ---------- tabbar ---------- */
-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#fff;border-top:1px solid var(--line);display:flex;z-index:60;padding-bottom:env(safe-area-inset-bottom)}
-nav button{flex:1;border:none;background:none;padding:8px 0 10px;font-size:10.5px;color:#9CA3AF;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
-nav button .ico{font-size:20px}
-nav button.on{color:var(--primary);font-weight:700}
-/* ---------- modal ---------- */
-.mask{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:none;align-items:flex-end;justify-content:center}
-.mask.on{display:flex}
-.sheet{background:#fff;width:100%;max-width:430px;border-radius:20px 20px 0 0;max-height:88vh;overflow-y:auto;padding:18px 16px 28px;animation:up .25s}
-@keyframes up{from{transform:translateY(40px);opacity:.5}to{transform:none;opacity:1}}
-.sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.sheet-head h3{font-size:17px;font-weight:800}
-.close{border:none;background:#F3F4F6;width:28px;height:28px;border-radius:50%;font-size:14px;cursor:pointer;color:var(--sub)}
-.field{margin-bottom:12px}
-.field label{display:block;font-size:12.5px;color:var(--sub);font-weight:600;margin-bottom:5px}
-.field input[type=text],.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:14px;font-family:inherit;outline:none}
-.field textarea{resize:none;height:76px}
-.field input:focus,.field textarea:focus{border-color:var(--primary)}
-.big-btn{width:100%;background:var(--grad);color:#fff;border:none;border-radius:24px;padding:12px;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px}
-.tag-grid{display:flex;flex-wrap:wrap;gap:7px}
-.detail-hero{border-radius:14px;padding:22px;text-align:center;font-size:48px;margin-bottom:12px}
-.d-row{display:flex;gap:10px;margin-bottom:10px;font-size:13.5px}
-.d-row .k{color:var(--sub);min-width:58px;flex-shrink:0}
-.d-desc{font-size:13.5px;color:#374151;background:#F9FAFB;border-radius:12px;padding:12px;margin:10px 0}
-.d-actions{display:flex;gap:10px;margin-top:14px}
-.d-actions button{flex:1;border-radius:22px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;border:1.5px solid var(--primary)}
-.btn-ghost{background:#fff;color:var(--primary)}
-.btn-solid{background:var(--grad);color:#fff;border:none!important}
-/* ---------- product intro ---------- */
-.pi-sec{margin-bottom:14px}
-.pi-sec h4{font-size:13.5px;font-weight:800;color:var(--primary);margin-bottom:6px;display:flex;align-items:center;gap:6px}
-.pi-sec p,.pi-sec li{font-size:12.8px;color:#4B5563}
-.pi-sec ul{padding-left:18px}
-.pi-box{background:#FFF8F0;border-radius:12px;padding:10px 12px;margin-bottom:8px}
-.pi-box b{font-size:12.8px}
-.tree{font-family:ui-monospace,Consolas,monospace;font-size:11.8px;background:#1F2329;color:#E5E7EB;border-radius:12px;padding:12px;line-height:1.7;white-space:pre;overflow-x:auto}
-/* ---------- toast ---------- */
-#toast{position:fixed;top:18%;left:50%;transform:translateX(-50%);background:rgba(31,35,41,.88);color:#fff;padding:9px 20px;border-radius:22px;font-size:13.5px;z-index:200;opacity:0;transition:.25s;pointer-events:none;max-width:80%;text-align:center}
-#toast.on{opacity:1}
-.footer-note{text-align:center;font-size:11px;color:#B0B6BE;padding:8px 0 4px}
-</style>
+<meta name="theme-color" content="#FAFBF9">
+<title>周末出发 WeekendGO · 大学生的周末探索计划</title>
+<link rel="preload" as="image" href="assets/map-hangzhou-sunny-v1.jpg">
+<link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body data-weather="sunny">
+
+<!-- 共享 SVG：印章粗糙滤镜与线性图标 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <filter id="rough" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6"/>
+    </filter>
+    <symbol id="i-weekend" viewBox="0 0 24 24"><path d="M2.5 19.5 9 8.5l3.2 5.3L15 10l6.5 9.5z" fill="currentColor"/></symbol>
+    <symbol id="i-weekend-o" viewBox="0 0 24 24"><path d="M2.5 19.5 9 8.5l3.2 5.3L15 10l6.5 9.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+    <symbol id="i-team" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="8" r="3.4"/><path d="M3 19.5c.6-3.3 3-5 6-5s5.4 1.7 6 5"/><circle cx="16.5" cy="7.5" r="2.6"/><path d="M16 12.8c2.6 0 4.4 1.4 5 4.2"/></g></symbol>
+    <symbol id="i-collect" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 6.5C9.8 5 6.8 4.6 3.5 5v13c3.3-.4 6.3 0 8.5 1.5 2.2-1.5 5.2-1.9 8.5-1.5V5c-3.3-.4-6.3 0-8.5 1.5z"/><path d="M12 6.5v13"/></g></symbol>
+    <symbol id="i-me" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c.8-3.8 3.8-5.8 7.5-5.8s6.7 2 7.5 5.8"/></g></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9h12l-6 7z" fill="currentColor"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 30"><path d="M12 29s10-11 10-18A10 10 0 0 0 2 11c0 7 10 18 10 18z" fill="currentColor"/><circle cx="12" cy="11" r="4" fill="#fff"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-sunny" viewBox="0 0 48 48"><g stroke="#E4B04F" stroke-width="2.6" stroke-linecap="round"><path d="M24 3v6M24 39v6M3 24h6M39 24h6M9.2 9.2l4.2 4.2M34.6 34.6l4.2 4.2M9.2 38.8l4.2-4.2M34.6 13.4l4.2-4.2"/></g><circle cx="24" cy="24" r="10" fill="#EDC777"/><circle cx="21" cy="21" r="4" fill="#F6DD9B"/></symbol>
+    <symbol id="i-cloudy" viewBox="0 0 48 48"><circle cx="17" cy="17" r="7" fill="#EDC777"/><path d="M14 36h22a8 8 0 0 0 0-16 11 11 0 0 0-21 3 6.5 6.5 0 0 0-1 13z" fill="#C9DBDA" stroke="#8FB0AE" stroke-width="2"/></symbol>
+    <symbol id="i-rain" viewBox="0 0 48 48"><path d="M13 29h22a8 8 0 0 0 0-16 11 11 0 0 0-21 3 6.5 6.5 0 0 0-1 13z" fill="#BCD3DE" stroke="#6D98B2" stroke-width="2"/><g stroke="#4F87AB" stroke-width="2.6" stroke-linecap="round"><path d="M17 34l-2 5M25 34l-2 5M33 34l-2 5"/></g></symbol>
+    <symbol id="i-snow" viewBox="0 0 48 48"><path d="M13 28h22a8 8 0 0 0 0-16 11 11 0 0 0-21 3 6.5 6.5 0 0 0-1 13z" fill="#E6EEF2" stroke="#8EA6B6" stroke-width="2"/><g fill="#8EA6B6"><circle cx="16" cy="35" r="2"/><circle cx="24" cy="39" r="2"/><circle cx="32" cy="35" r="2"/></g></symbol>
+    <symbol id="i-unknown" viewBox="0 0 48 48"><circle cx="24" cy="24" r="15" fill="none" stroke="#9AA9A6" stroke-width="2.4" stroke-dasharray="4 4"/><path d="M19.5 20a4.5 4.5 0 1 1 6.3 4.1c-1.2.6-1.8 1.4-1.8 2.9M24 32.5v.5" fill="none" stroke="#7C8C89" stroke-width="2.4" stroke-linecap="round"/></symbol>
+  </defs>
+</svg>
+
 <div id="app">
-  <header>
-    <div class="h-row">
-      <div class="logo">🧭 周末出发<span class="go">WeekendGO</span></div>
-      <div style="display:flex;gap:6px">
-        <button class="city-btn" onclick="openAbout()" style="font-weight:700">ℹ️ 说明</button>
-        <button class="city-btn" onclick="openCityPicker()">📍 <span id="cityLabel">北京</span> ▾</button>
-      </div>
-    </div>
-    <div class="weather-bar">
-      <div class="w-main" id="weatherMain">☀️ 晴 26°C</div>
-      <div class="w-sim" title="模拟天气变化，观察推荐实时调整">
-        <span style="opacity:.85">模拟天气</span>
-        <button data-w="sunny" class="on">晴</button><button data-w="cloudy">多云</button><button data-w="rain">雨</button>
-      </div>
-    </div>
-  </header>
-
   <main>
-    <!-- ============ Tab 1 逛逛 ============ -->
-    <section class="page on" id="page-discover">
-      <div class="pref">
-        <div class="pref-title"><span>🎯 我的周末偏好</span><span id="prefSummary" style="font-weight:400"></span></div>
-        <div style="font-size:11.5px;color:var(--sub);margin-bottom:5px">感兴趣的类型（可多选）</div>
-        <div class="chips" id="interestChips"></div>
-        <div class="row2" style="margin-top:10px">
-          <div>
-            <div style="font-size:11.5px;color:var(--sub);margin-bottom:5px">💰 本周末预算上限</div>
-            <div class="budget-row"><input type="range" id="budgetRange" min="0" max="500" step="50" value="200"><div class="budget-val" id="budgetVal">≤200元</div></div>
-          </div>
-          <div>
-            <div style="font-size:11.5px;color:var(--sub);margin-bottom:5px">👥 同行人数</div>
-            <div class="chips" id="crowdChips"></div>
-          </div>
+    <!-- ============ 周末 ============ -->
+    <section class="page on" id="page-weekend" aria-label="周末">
+      <header class="top">
+        <div class="brand">
+          <b class="brand-name">周末出发<svg class="brush" viewBox="0 0 90 10" aria-hidden="true"><path d="M3 7c20-4 44-5 84-3" fill="none" stroke="#D87843" stroke-width="3" stroke-linecap="round"/></svg></b>
+          <span class="brand-sub">大学生的周末探索计划</span>
         </div>
+        <button class="city" id="cityBtn" aria-label="切换城市"><span id="cityLabel">杭州</span><svg><use href="#i-down"/></svg></button>
+      </header>
+
+      <div class="hero">
+        <div class="hero-text">
+          <h1 id="heroTitle"></h1>
+          <p class="count" id="countdown"></p>
+        </div>
+        <button class="wx" id="wxBtn" aria-label="当前天气，点击切换天气演示">
+          <svg class="wx-ico" id="wxIcon"><use href="#i-sunny"/></svg>
+          <span class="wx-now" id="wxNow"></span>
+          <span class="wx-temp" id="wxTemp"></span>
+          <span class="wx-demo">天气演示<svg><use href="#i-chev"/></svg></span>
+        </button>
       </div>
-      <div class="sec-head" style="margin-top:14px">
-        <h2 id="recTitle">为你推荐</h2><span class="more" onclick="toast('已按 匹配度 = 兴趣35% + 天气25% + 预算20% + 同行20% 排序')">排序逻辑 ▾</span>
-      </div>
-      <div id="recList"></div>
+
+      <div class="scene" id="scene"></div>
+      <div class="spot" id="spot"></div>
+
+      <section class="block" id="planBlock" hidden></section>
+
+      <section class="block">
+        <div class="block-head">
+          <h2>这周末，为你挑了 3 个</h2>
+          <button class="link" id="prefBtn">调整偏好</button>
+        </div>
+        <p class="block-note" id="recNote"></p>
+        <div class="rec-list" id="recList"></div>
+        <button class="link more" id="moreBtn" hidden></button>
+      </section>
+      <p class="foot-note">活动、天气与队伍为演示数据 · 打卡与票根只保存在本机</p>
     </section>
 
-    <!-- ============ Tab 2 组队 ============ -->
-    <section class="page" id="page-team">
-      <div class="sec-head"><h2>🤝 组队大厅</h2><span class="more" onclick="toast('队伍数据保存在本地，用于演示')">组队规则 ▾</span></div>
-      <p style="font-size:12.5px;color:var(--sub);margin:-4px 2px 12px">一个人也可以出发，但结伴更有趣——发起新队伍，或加入感兴趣的周末小队。</p>
+    <!-- ============ 组队 ============ -->
+    <section class="page" id="page-team" aria-label="组队">
+      <header class="page-head">
+        <h1>组队</h1>
+        <p id="teamSub"></p>
+      </header>
       <div id="teamList"></div>
+      <p class="foot-note">队伍与成员为演示数据，加入和退出只保存在本机</p>
     </section>
 
-    <!-- ============ Tab 3 打卡 ============ -->
-    <section class="page" id="page-checkin">
-      <div class="sec-head"><h2>📍 我的周末足迹</h2></div>
-      <div class="stats" id="statRow"></div>
-      <div class="sec-head"><h2 style="font-size:14.5px">打卡时间线</h2><span class="more" onclick="toast('长按可删除（演示版暂未开放）')">记录：点击活动卡「打卡」生成</span></div>
-      <div id="checkinList"></div>
+    <!-- ============ 收集 ============ -->
+    <section class="page" id="page-collect" aria-label="我的收集">
+      <header class="page-head">
+        <h1>我的收集</h1>
+        <p id="collectSub"></p>
+      </header>
+      <div id="collectBody"></div>
     </section>
 
-    <!-- ============ Tab 4 攻略 ============ -->
-    <section class="page" id="page-guide">
-      <div class="sec-head"><h2>📝 攻略广场</h2><span class="more" onclick="openPublish()">✍️ 写攻略</span></div>
-      <div id="guideList"></div>
+    <!-- ============ 我的 ============ -->
+    <section class="page" id="page-me" aria-label="我的">
+      <header class="page-head"><h1>我的</h1></header>
+      <div id="meBody"></div>
     </section>
   </main>
 
-  <button class="fab" id="fab" onclick="onFab()" title="快捷发布">＋</button>
-
-  <nav>
-    <button data-tab="discover" class="on" onclick="switchTab('discover')"><span class="ico">🧭</span>逛逛</button>
-    <button data-tab="team" onclick="switchTab('team')"><span class="ico">🤝</span>组队</button>
-    <button data-tab="checkin" onclick="switchTab('checkin')"><span class="ico">📍</span>打卡</button>
-    <button data-tab="guide" onclick="switchTab('guide')"><span class="ico">📝</span>攻略</button>
+  <nav class="tabbar" aria-label="主导航">
+    <button data-tab="weekend" class="on"><svg class="ico-on"><use href="#i-weekend"/></svg><svg class="ico-off"><use href="#i-weekend-o"/></svg><span>周末</span></button>
+    <button data-tab="team"><svg><use href="#i-team"/></svg><span>组队</span></button>
+    <button data-tab="collect"><svg><use href="#i-collect"/></svg><span>收集</span></button>
+    <button data-tab="me"><svg><use href="#i-me"/></svg><span>我的</span></button>
   </nav>
 </div>
 
-<!-- 活动详情 sheet -->
-<div class="mask" id="maskDetail" onclick="if(event.target===this)closeSheet('maskDetail')">
-  <div class="sheet" id="detailBody"></div>
+<div class="mask" id="mask" hidden>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
 </div>
-<!-- 通用表单 sheet -->
-<div class="mask" id="maskForm" onclick="if(event.target===this)closeSheet('maskForm')">
-  <div class="sheet" id="formBody"></div>
-</div>
-<!-- 产品说明 sheet -->
-<div class="mask" id="maskAbout" onclick="if(event.target===this)closeSheet('maskAbout')">
-  <div class="sheet" id="aboutBody"></div>
-</div>
-<div id="toast"></div>
+<div class="reveal" id="reveal" role="dialog" aria-modal="true" aria-label="打卡成功" hidden></div>
+<div id="toast" role="status" aria-live="polite"></div>
 
-<script>
-/* ================================================================
-   周末出发 WeekendGO —— 周末城市探索指南（雏形 Demo）
-   纯前端实现：数据为内置 Mock + localStorage 本地持久化
-   ================================================================ */
-
-/* ---------------- 基础数据 ---------------- */
-const CITIES = ['北京','上海','广州','深圳','杭州'];
-const CATS = {
-  exhibit:{name:'展览',color:'#8B5CF6'}, market:{name:'市集',color:'#F59E0B'},
-  show:{name:'演出',color:'#F43F5E'},   hike:{name:'徒步',color:'#10B981'},
-  cafe:{name:'咖啡/轻食',color:'#D97706'}, night:{name:'夜生活',color:'#3B82F6'}
-};
-const INTERESTS = Object.keys(CATS);
-const CROWDS = [
-  {id:'solo',name:'独自',emoji:'🚶'},{id:'duo',name:'两人',emoji:'👯'},
-  {id:'small',name:'3-5人',emoji:'👨‍👩‍👧'},{id:'big',name:'大部队',emoji:'🎉'}
-];
-
-/* 活动库：weatherFit sunny=晴天更佳 rainy=雨天友好 any=不受影响 */
-const ACTS = [
-  // 北京
-  {id:1,city:'北京',cat:'exhibit',title:'「宇宙考古」沉浸式空间探索展',venue:'798艺术中心',area:'朝阳区·798',time:'周六周日 10:00-18:00',price:88,weatherFit:'rainy',crowd:['solo','duo','small'],desc:'联合国际空间机构打造的大型沉浸式展览，1200㎡ 星际场景，可预约讲解场，出片率极高。雨天/高温天的绝佳去处。'},
-  {id:2,city:'北京',cat:'market',title:'伍德吃托克·秋季艺术市集',venue:'隆福文创园',area:'东城区·隆福寺',time:'周六至周日 11:00-21:00',price:35,weatherFit:'any',crowd:['duo','small','big'],desc:'100+ 独立创作者摊位，古着、黑胶、手作、精酿啤酒，傍晚有露天乐队演出。'},
-  {id:3,city:'北京',cat:'hike',title:'香山红叶季·入门徒步线',venue:'香山公园—碧云寺环线',area:'海淀区·香山',time:'周六 08:30 集合',price:10,weatherFit:'sunny',crowd:['solo','small','big'],desc:'经典入门徒步环线，全程约 8km / 3.5h，山顶可俯瞰北京城。领队负责带路和拍照，适合新手。'},
-  {id:4,city:'北京',cat:'show',title:'鼓浪音乐节·城市周末场',venue:'首钢园户外草坪',area:'石景山区·首钢园',time:'周六 14:00-22:00',price:180,weatherFit:'sunny',crowd:['duo','small','big'],desc:'独立乐队 + 电子舞台双舞台设置，日落场最出片，场内有创意餐车区。'},
-  // 上海
-  {id:5,city:'上海',cat:'exhibit',title:'teamLab 无界美术馆晨间场',venue:'teamLab无界 上海',area:'黄浦区·滨江',time:'周日 10:00-12:00 人少场',price:199,weatherFit:'rainy',crowd:['solo','duo'],desc:'晨间人少场，光影花海随意拍。提供和服租赁拍照服务，室内恒温，雨天无忧。'},
-  {id:6,city:'上海',cat:'market',title:'安义夜巷·周末夜市',venue:'静安嘉里中心外街',area:'静安区·静安寺',time:'周六日 16:00-23:00',price:0,weatherFit:'any',crowd:['duo','small','big'],desc:'免费入场！花市、街头小吃、黑胶打碟，本地人浓度最高的 citywalk 打卡点。'},
-  {id:7,city:'上海',cat:'hike',title:'苏州河两岸 citywalk 12km',venue:'四行仓库→外白渡桥',area:'静安→虹口',time:'周日 09:00 集合',price:0,weatherFit:'sunny',crowd:['solo','duo','small'],desc:'免费领队讲解苏州河工业遗产，途经 M50、四行仓库，终点外白渡桥看日落。'},
-  {id:8,city:'上海',cat:'cafe',title:'永康路咖啡巡礼 Half-Day',venue:'永康路街区',area:'徐汇区·永康路',time:'周六日 全天',price:80,weatherFit:'rainy',crowd:['solo','duo'],desc:'一条路 20+ 家独立咖啡馆，附赠手绘打卡地图，集满 3 家印章换限定贴纸。'},
-  // 广州
-  {id:9,city:'广州',cat:'exhibit',title:'广东省博物馆「海上丝绸之路」特展',venue:'广东省博物馆',area:'天河区·珠江新城',time:'周六日 09:00-17:00',price:0,weatherFit:'rainy',crowd:['solo','duo','small','big'],desc:'免费特展（需预约），沉船文物 + 互动航海装置，空调很足，雨天遛娃遛自己都合适。'},
-  {id:10,city:'广州',cat:'night',title:'珠江夜航 + 琶醍精酿市集',venue:'琶醍啤酒文化创意区',area:'海珠区·琶醍',time:'周六 19:00-23:30',price:98,weatherFit:'any',crowd:['duo','small','big'],desc:'含珠江游船票 + 精酿 2 杯，船上看小蛮腰灯光秀，上岸继续逛江边市集。'},
-  {id:11,city:'广州',cat:'hike',title:'火炉山森林公园轻徒步',venue:'火炉山北门环线',area:'天河区·火炉山',time:'周日 08:00 集合',price:0,weatherFit:'sunny',crowd:['solo','small'],desc:'免费！全程 6km 缓坡，2.5h 登顶，山脚有著名农家菜，徒步完组队干饭。'},
-  // 深圳
-  {id:12,city:'深圳',cat:'market',title:'华侨城创意市集 T-Street',venue:'华侨城创意文化园',area:'南山区·华侨城',time:'周六日 14:00-22:00',price:0,weatherFit:'any',crowd:['duo','small'],desc:'免费入场，设计党天堂：原创插画、器物、香薰，园内书店画廊可顺路逛。'},
-  {id:13,city:'深圳',cat:'show',title:'海上世界灯光水秀 + 街头音乐夜',venue:'海上世界广场',area:'南山区·海上世界',time:'周六 18:30-22:00',price:0,weatherFit:'any',crowd:['duo','small','big'],desc:'免费水幕灯光秀（19:30/20:30 两场），周边明华轮夜景超出片，餐酒吧林立。'},
-  {id:14,city:'深圳',cat:'hike',title:'梧桐山「鹏城第一峰」登顶线',venue:'梧桐山北路—好汉坡',area:'罗湖区·梧桐山',time:'周日 07:30 集合',price:0,weatherFit:'sunny',crowd:['solo','small','big'],desc:'深圳最高峰，全程约 9km，登顶可看云海与深圳市景，强度中等，结伴更安全。'},
-  // 杭州
-  {id:15,city:'杭州',cat:'hike',title:'九溪十八涧溯溪徒步',venue:'九溪烟树—龙井村环线',area:'西湖区·九溪',time:'周六 09:00 集合',price:0,weatherFit:'sunny',crowd:['solo','duo','small'],desc:'经典入门溯溪线，全程林荫遮蔽约 7km，终点龙井村喝茶，夏天也凉快。'},
-  {id:16,city:'杭州',cat:'exhibit',title:'中国美院民艺博物馆「茶事」展',venue:'中国美院象山校区',area:'西湖区·转塘',time:'周六日 09:00-16:30',price:0,weatherFit:'rainy',crowd:['solo','duo'],desc:'隈研吾设计建筑本身就是展品，本次茶文化特展含宋代点茶体验课（材料费另计）。'},
-  {id:17,city:'杭州',cat:'market',title:'武林夜市·国潮文创周末场',venue:'武林广场东通道',area:'下城区·武林门',time:'周六日 17:00-22:30',price:0,weatherFit:'any',crowd:['duo','small','big'],desc:'免费！国潮手作、非遗小吃、套圈游戏，地铁站直达，适合晚饭后遛弯。'},
-];
-
-/* 种子队伍 / 攻略 / 打卡 */
-const AVATARS=['🦊','🐼','🐨','🦁','🐧','🐸','🐵','🐰'];
-const SEED_TEAMS=[
-  {id:'t1',actId:3,title:'周六香山红叶徒步搭子',time:'周六 08:30',meet:'地铁西郊线香山站 A口',cap:6,members:['🦊','🐼','🐨'],note:'新手友好，领队带路，全程拍照，下山约火锅'},
-  {id:'t2',actId:6,title:'安义夜巷逛吃小分队',time:'周六 17:30',meet:'静安寺地铁站 2号口',cap:4,members:['🦁','🐧'],note:'主打一个边走边吃，预算 100 以内'},
-  {id:'t3',actId:1,title:'宇宙考古展 + 798 一日游',time:'周日 10:00',meet:'798艺术中心北门',cap:5,members:['🐸','🐵','🐰','🦊'],note:'已约 10:30 讲解场，看完展逛画廊街'},
-  {id:'t4',actId:14,title:'周日梧桐山登顶团',time:'周日 07:30',meet:'梧桐山北门公交站',cap:8,members:['🐼','🦁'],note:'装备：登山鞋 + 2L 水，量力而行，安全第一'},
-];
-const SEED_GUIDES=[
-  {id:'g1',title:'雨天的 798 才是完全体：室内展馆一日路线',author:'爱看展的阿茶',tags:['北京','展览','雨天备选'],excerpt:'谁说下雨不能出门？798 室内展馆连逛 4 家不用打伞，含餐厅避雷和拍照机位……',likes:128,body:'路线：UCCA尤伦斯→木木美术馆→宇宙考古展→751 图书馆。\n tips：1）雨天园内人少，拍照不用排队；2）讲解场记得提前一天预约；3）东门进可以少走 800 米。'},
-  {id:'g2',title:'0 元玩转上海：一条不花钱的周末动线',author:'穷游大学生Leo',tags:['上海','免费','citywalk'],excerpt:'苏州河 citywalk + 安义夜巷 + 外滩夜景，全天只花了 38 元地铁费和一瓶水……',likes:96,body:'上午苏州河（免费讲解团），下午 M50 免费画廊，傍晚安义夜巷闻味道（吃不吃随意），晚上外白渡桥看日落。全天 0 门票。'},
-  {id:'g3',title:'广州徒步新手第一山：火炉山保姆级攻略',author:'爬楼狂魔小蛮',tags:['广州','徒步','新手友好'],excerpt:'公交直达、全程缓坡、2.5 小时登顶、山脚农家菜收尾，这是我带过最轻松的团……',likes:87,body:'北门上，猪头石打卡，原路下。必带 1.5L 水。下山认准「辉记农家菜」，走地鸡一般但山水豆腐花必点。'},
-  {id:'g4',title:'一个人也能玩得很好：solo 周末自救指南',author:'独立周末研究员',tags:['通用','单人','心态'],excerpt:'一个人看展、一个人 citywalk、一个人看电影——教你用最低成本把周末填满……',likes:203,body:'1）用偏好筛选把「适合独自」的活动挑出来；2）优先选有时段预约制的展，人少体验好；3）打卡记录写一句话，一个月后回看会很有成就感。'},
-];
-const SEED_CHECKINS=[
-  {actTitle:'伍德吃托克·春季市集',emoji:'🎪',mood:'😎',note:'淘到一张 90 年代的黑胶，老板还送了贴纸！',time:'上周六 14:22',cost:65},
-  {actTitle:'亮马河皮划艇初体验',emoji:'🚣',mood:'🥳',note:'翻了两次船，但看夕阳的时候觉得值了',time:'上周日 18:05',cost:120},
-];
-
-/* ---------------- 状态 ---------------- */
-const store = {
-  city: localStorage.getItem('wg_city') || '北京',
-  weather: localStorage.getItem('wg_weather') || 'sunny',
-  interests: JSON.parse(localStorage.getItem('wg_int') || 'null') || ['exhibit','market','hike'],
-  budget: +(localStorage.getItem('wg_budget') ?? 200),
-  crowd: localStorage.getItem('wg_crowd') || 'duo',
-  teams: JSON.parse(localStorage.getItem('wg_teams') || 'null') || SEED_TEAMS,
-  joined: JSON.parse(localStorage.getItem('wg_joined') || '[]'),
-  guides: JSON.parse(localStorage.getItem('wg_guides') || 'null') || SEED_GUIDES,
-  liked: JSON.parse(localStorage.getItem('wg_liked') || '[]'),
-  checkins: JSON.parse(localStorage.getItem('wg_checkins') || 'null') || SEED_CHECKINS,
-};
-const save = () => {
-  const d = (k,v)=>localStorage.setItem(k,typeof v==='string'?v:JSON.stringify(v));
-  d('wg_city',store.city); d('wg_weather',store.weather); d('wg_int',store.interests);
-  d('wg_budget',store.budget); d('wg_crowd',store.crowd); d('wg_teams',store.teams);
-  d('wg_joined',store.joined); d('wg_guides',store.guides); d('wg_liked',store.liked);
-  d('wg_checkins',store.checkins);
-};
-const ME = '🙋'; // 当前用户头像
-
-/* ---------------- 天气（模拟） ---------------- */
-const WEATHER_MAP = {
-  sunny:{icon:'☀️',name:'晴',tip:'适合户外活动，紫外线较强注意防晒'},
-  cloudy:{icon:'⛅',name:'多云',tip:'体感舒适，室内外活动都合适'},
-  rain:{icon:'🌧️',name:'小雨',tip:'已为你优先推荐室内与雨天友好活动'},
-};
-function renderWeather(){
-  const w = WEATHER_MAP[store.weather];
-  const temp = {sunny:26,cloudy:22,rain:19}[store.weather];
-  document.getElementById('weatherMain').textContent = `${w.icon} ${w.name} ${temp}°C · ${store.city}周末`;
-  document.querySelectorAll('.w-sim button').forEach(b=>b.classList.toggle('on',b.dataset.w===store.weather));
-}
-
-/* ---------------- 推荐打分 ----------------
-   匹配度 = 兴趣匹配35% + 天气适配25% + 预算适配20% + 同行适配20% */
-function scoreAct(a){
-  const reasons=[];
-  let interest = store.interests.includes(a.cat) ? 1 : 0.15;
-  if(store.interests.includes(a.cat)) reasons.push({t:`✓ ${CATS[a.cat].name}是你感兴趣的`,c:'good'});
-  let weather; const w=store.weather;
-  if(a.weatherFit==='any'){weather=0.85;reasons.push({t:'☂️ 晴雨皆宜',c:'good'});}
-  else if(a.weatherFit===w){weather=1;reasons.push({t:w==='rain'?'🌧️ 雨天友好':w==='sunny'?'☀️ 晴天优选':'☁️ 多云舒适',c:'good'});}
-  else{weather=0.2;reasons.push({t:w==='rain'?'☔ 雨天体验打折':a.weatherFit==='rainy'?'同为室内备选':'⚠️ 户外受天气影响',c: a.weatherFit==='rainy'&&w==='sunny'?'':'warn'});}
-  let budget = a.price<=store.budget?1:Math.max(0.15,1-(a.price-store.budget)/300);
-  if(a.price<=store.budget) reasons.push({t:a.price===0?'🆓 免费活动':`💰 ¥${a.price} 在预算内`,c:'good'});
-  else reasons.push({t:`💸 超预算 ¥${a.price-store.budget}`,c:'warn'});
-  let crowd = a.crowd.includes(store.crowd)?1:0.3;
-  if(a.crowd.includes(store.crowd)) reasons.push({t:`👥 适合${CROWDS.find(c=>c.id===store.crowd).name}出行`,c:'good'});
-  const score = Math.round((interest*0.35+weather*0.25+budget*0.2+crowd*0.2)*100);
-  return {score,reasons:reasons.sort((x,y)=>(x.c==='warn')-(y.c==='warn')).slice(0,3)};
-}
-
-/* ---------------- 渲染：逛逛 ---------------- */
-function renderDiscover(){
-  document.getElementById('cityLabel').textContent = store.city;
-  const list = ACTS.filter(a=>a.city===store.city)
-    .map(a=>({a,s:scoreAct(a)}))
-    .sort((x,y)=>y.s.score-x.s.score);
-  document.getElementById('recTitle').textContent = `为你推荐 · ${WEATHER_MAP[store.weather].name}天`;
-  document.getElementById('recList').innerHTML = list.map(({a,s})=>`
-    <div class="act-card" onclick="openDetail(${a.id})">
-      <div class="match-pill">${s.score}% 匹配</div>
-      <div class="act-top">
-        <div class="cover" style="background:${catBg(a.cat)}">${catEmoji(a.cat)}</div>
-        <div class="act-info">
-          <span class="cat-badge" style="background:${CATS[a.cat].color}">${CATS[a.cat].name}</span>
-          <div class="act-title">${a.title}</div>
-          <div class="act-meta"><span>🕑 ${a.time}</span><span>📍 ${a.area} · ${a.price===0?'免费':'¥'+a.price}</span></div>
-        </div>
-      </div>
-      <div class="reasons">${s.reasons.map(r=>`<span class="reason ${r.c}">${r.t}</span>`).join('')}</div>
-      <div class="act-foot">
-        <button onclick="event.stopPropagation();openDetail(${a.id})">详情</button>
-        <button class="primary" onclick="event.stopPropagation();quickTeam(${a.id})">+ 组队</button>
-        <button onclick="event.stopPropagation();openCheckin(${a.id})">打卡</button>
-      </div>
-    </div>`).join('') || `<div class="empty"><span class="big">🏙️</span>该城市活动筹备中，试试其他城市</div>`;
-}
-const catEmoji = c => ({exhibit:'🖼️',market:'🎪',show:'🎸',hike:'⛰️',cafe:'☕',night:'🌃'})[c];
-const catBg = c => ({exhibit:'linear-gradient(135deg,#EDE9FE,#DDD6FE)',market:'linear-gradient(135deg,#FEF3C7,#FDE68A)',show:'linear-gradient(135deg,#FFE4E6,#FECDD3)',hike:'linear-gradient(135deg,#D1FAE5,#A7F3D0)',cafe:'linear-gradient(135deg,#FFEDD5,#FED7AA)',night:'linear-gradient(135deg,#DBEAFE,#BFDBFE)'})[c];
-
-/* ---------------- 渲染：组队 ---------------- */
-function renderTeams(){
-  const list = store.teams.filter(t=>{const a=ACTS.find(x=>x.id===t.actId);return a&&a.city===store.city;});
-  document.getElementById('teamList').innerHTML = list.map(t=>{
-    const a=ACTS.find(x=>x.id===t.actId);
-    const joined=store.joined.includes(t.id);
-    const full=t.members.length>=t.cap;
-    return `<div class="team-card">
-      <div class="team-head">
-        <div><div class="team-title">${t.title}</div><div class="team-sub">🎯 关联活动：${a.title}</div></div>
-        <span class="slots ${full?'full':''}">${full?'已满员':'缺 '+(t.cap-t.members.length)+' 人'}</span>
-      </div>
-      <div class="team-info">
-        <span>🕑 ${t.time}</span><span>📍 集合：${t.meet}</span><span>💬 ${t.note}</span>
-      </div>
-      <div class="avatars">
-        ${t.members.map((m,i)=>`<span class="avatar" style="background:${memColor(i)}">${m}</span>`).join('')}
-        ${Array.from({length:Math.max(0,t.cap-t.members.length)}).map(()=>'<span class="avatar ghost">＋</span>').join('')}
-      </div>
-      <button class="join-btn ${joined?'joined':''}" ${full&&!joined?'disabled':''} onclick="toggleJoin('${t.id}')">${joined?'✓ 已加入':full?'已满员':'加入队伍'}</button>
-      <div style="clear:both"></div>
-    </div>`;
-  }).join('') || `<div class="empty"><span class="big">🤝</span>该城市暂无队伍，点右下角 ＋ 发起一个！</div>`;
-}
-const memColor = i => ['#FF7A00','#3B82F6','#8B5CF6','#10B981','#F43F5E','#F59E0B','#14B8A6','#6366F1'][i%8];
-function toggleJoin(id){
-  const i = store.joined.indexOf(id);
-  const t = store.teams.find(x=>x.id===id);
-  if(i>=0){store.joined.splice(i,1);t.members=t.members.filter(m=>m!==ME);toast('已退出队伍');}
-  else{
-    if(t.members.length>=t.cap)return toast('队伍已满员啦');
-    store.joined.push(id);t.members.push(ME);toast('🎉 加入成功！出发前留意集合时间');
-  }
-  save();renderTeams();
-}
-
-/* ---------------- 渲染：打卡 ---------------- */
-function renderCheckins(){
-  const total = store.checkins.reduce((s,c)=>s+(c.cost||0),0);
-  document.getElementById('statRow').innerHTML = `
-    <div class="stat"><div class="num">${store.checkins.length}</div><div class="lbl">累计打卡</div></div>
-    <div class="stat"><div class="num">¥${total}</div><div class="lbl">周末总花费</div></div>
-    <div class="stat"><div class="num">${new Set(store.checkins.map(c=>c.actTitle)).size}</div><div class="lbl">解锁去处</div></div>`;
-  document.getElementById('checkinList').innerHTML = store.checkins.map((c,i)=>`
-    <div class="tl-item">
-      <div class="tl-emoji" style="background:${catBg(c.cat||'market')}">${c.emoji}</div>
-      <div class="tl-body">
-        <div class="tl-title">${c.actTitle}</div>
-        <div class="tl-note"><span class="mood">${c.mood}</span>${c.note}</div>
-        <div class="tl-time">🕑 ${c.time}${c.cost?' · 花费 ¥'+c.cost:''}</div>
-      </div>
-    </div>`).join('') || `<div class="empty"><span class="big">📍</span>还没有打卡记录，去逛逛挑个活动出发吧！</div>`;
-}
-function openCheckin(actId){
-  const a=ACTS.find(x=>x.id===actId);
-  openForm(`<div class="sheet-head"><h3>📍 打卡 · ${a.title}</h3><button class="close" onclick="closeSheet('maskForm')">✕</button></div>
-    <div class="field"><label>此刻心情</label><div class="chips" id="moodChips">
-      ${['😎 值回票价','🥳 超开心','😌 治愈了','🤩 想再来','🙃 一般般'].map((m,i)=>`<span class="chip" data-m="${m.split(' ')[0]}" onclick="pick(this)">${m}</span>`).join('')}
-    </div></div>
-    <div class="field"><label>一句话感想（会同步到打卡时间线）</label><textarea id="ciNote" placeholder="例：讲解小哥太有意思了，转头就去下单了原画集"></textarea></div>
-    <div class="field"><label>本次花费（元，可留空为 0）</label><input type="text" id="ciCost" placeholder="88"></div>
-    <button class="big-btn" onclick="doCheckin('${a.title}','${catEmoji(a.cat)}','${a.cat}')">发布打卡 ✓</button>`);
-}
-let _mood='😎';
-function pick(el){document.querySelectorAll('#moodChips .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');_mood=el.dataset.m;}
-function doCheckin(title,emoji,cat){
-  const note=document.getElementById('ciNote').value.trim()||'打卡成功，下次写点感想～';
-  const cost=+document.getElementById('ciCost').value||0;
-  const now=new Date();
-  const wd=['周日','周一','周二','周三','周四','周五','周六'][now.getDay()];
-  store.checkins.unshift({actTitle:title,emoji,mood:_mood,cat,note,time:`${wd} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`,cost});
-  save();closeSheet('maskForm');renderCheckins();
-  switchTab('checkin');toast('📍 打卡成功！记录已同步到时间线');
-}
-
-/* ---------------- 渲染：攻略 ---------------- */
-function renderGuides(){
-  document.getElementById('guideList').innerHTML = store.guides.map(g=>`
-    <div class="guide-card" onclick="openGuide('${g.id}')">
-      <div class="g-title">${g.title}</div>
-      <div class="g-excerpt">${g.excerpt}</div>
-      <div class="g-tags">${g.tags.map(t=>`<span class="g-tag"># ${t}</span>`).join('')}</div>
-      <div class="g-foot"><span>✍️ ${g.author}</span>
-        <button class="g-like" onclick="event.stopPropagation();likeGuide('${g.id}')">${store.liked.includes(g.id)?'❤️':'🤍'} ${g.likes}</button>
-      </div>
-    </div>`).join('');
-}
-function likeGuide(id){
-  const g=store.guides.find(x=>x.id===id);
-  const i=store.liked.indexOf(id);
-  if(i>=0){store.liked.splice(i,1);g.likes--;}else{store.liked.push(id);g.likes++;}
-  save();renderGuides();
-}
-function openGuide(id){
-  const g=store.guides.find(x=>x.id===id);
-  openForm(`<div class="sheet-head"><h3>📝 攻略</h3><button class="close" onclick="closeSheet('maskForm')">✕</button></div>
-    <h2 style="font-size:18px;margin-bottom:8px">${g.title}</h2>
-    <div style="font-size:12px;color:var(--sub);margin-bottom:10px">✍️ ${g.author} · ${g.likes} 人觉得有用</div>
-    <div class="g-tags" style="margin-bottom:12px">${g.tags.map(t=>`<span class="g-tag"># ${t}</span>`).join('')}</div>
-    <div class="d-desc" style="white-space:pre-wrap">${g.body}</div>
-    <button class="big-btn" onclick="closeSheet('maskForm');switchTab('discover')">找同款活动 →</button>`);
-}
-function openPublish(){
-  openForm(`<div class="sheet-head"><h3>✍️ 分享你的周末攻略</h3><button class="close" onclick="closeSheet('maskForm')">✕</button></div>
-    <div class="field"><label>标题</label><input type="text" id="gTitle" placeholder="例：杭州雨天一日室内路线"></div>
-    <div class="field"><label>正文</label><textarea id="gBody" style="height:110px" placeholder="路线、花费、避雷、机位……"></textarea></div>
-    <div class="field"><label>标签</label><input type="text" id="gTags" placeholder="用空格分隔，例：杭州 展览 雨天备选"></div>
-    <button class="big-btn" onclick="doPublish()">发布攻略 🚀</button>`);
-}
-function doPublish(){
-  const t=document.getElementById('gTitle').value.trim();
-  const b=document.getElementById('gBody').value.trim();
-  if(!t||!b)return toast('标题和正文都要填哦');
-  const tags=document.getElementById('gTags').value.trim().split(/\s+/).filter(Boolean).slice(0,4);
-  store.guides.unshift({id:'g'+Date.now(),title:t,author:'我（demo 用户）',tags:tags.length?tags:['通用'],excerpt:b.slice(0,60)+'…',likes:0,body:b});
-  save();closeSheet('maskForm');renderGuides();switchTab('guide');toast('🚀 攻略已发布到广场');
-}
-
-/* ---------------- 活动详情 ---------------- */
-function openDetail(id){
-  const a=ACTS.find(x=>x.id===id);
-  const s=scoreAct(a);
-  const wf={sunny:'☀️ 晴天更佳',rainy:'☂️ 雨天友好',any:'🌤️ 晴雨皆宜'}[a.weatherFit];
-  openForm(`<div class="sheet-head"><h3>活动详情</h3><button class="close" onclick="closeSheet('maskForm')">✕</button></div>
-    <div class="detail-hero" style="background:${catBg(a.cat)}">${catEmoji(a.cat)}</div>
-    <div style="text-align:center;margin-bottom:12px">
-      <span class="cat-badge" style="background:${CATS[a.cat].color}">${CATS[a.cat].name}</span>
-      <h2 style="font-size:18px;margin-top:6px">${a.title}</h2>
-      <div style="font-size:12px;color:var(--sub);margin-top:4px">匹配度 ${s.score}% · ${wf}</div>
-    </div>
-    <div class="d-row"><span class="k">🕑 时间</span><span>${a.time}</span></div>
-    <div class="d-row"><span class="k">📍 地点</span><span>${a.venue}（${a.area}）</span></div>
-    <div class="d-row"><span class="k">💰 费用</span><span>${a.price===0?'免费':'约 ¥'+a.price+'/人'}${a.price>store.budget?' · <b style="color:var(--red)">超出你的预算</b>':''}</span></div>
-    <div class="d-row"><span class="k">👥 适合</span><span>${a.crowd.map(c=>CROWDS.find(x=>x.id===c).name).join(' / ')}</span></div>
-    <div class="d-desc">${a.desc}</div>
-    <div class="reasons">${s.reasons.map(r=>`<span class="reason ${r.c}">${r.t}</span>`).join('')}</div>
-    <div class="d-actions">
-      <button class="btn-ghost" onclick="closeSheet('maskForm');openCheckin(${a.id})">📍 我去过了，打卡</button>
-      <button class="btn-solid" onclick="closeSheet('maskForm');quickTeam(${a.id})">🤝 为它组队</button>
-    </div>`);
-}
-function quickTeam(actId){
-  const a=ACTS.find(x=>x.id===actId);
-  openForm(`<div class="sheet-head"><h3>🤝 发起组队 · ${a.title.slice(0,12)}…</h3><button class="close" onclick="closeSheet('maskForm')">✕</button></div>
-    <div class="field"><label>队伍名称</label><input type="text" id="tTitle" placeholder="例：周六看展搭子，缺3人"></div>
-    <div class="field"><label>集合时间</label><input type="text" id="tTime" placeholder="例：周六 10:00"></div>
-    <div class="field"><label>集合地点</label><input type="text" id="tMeet" placeholder="例：${a.venue}正门"></div>
-    <div class="field"><label>成团人数（含你）</label><div class="chips" id="capChips">${[2,3,4,6,8].map((n,i)=>`<span class="chip ${i===1?'on':''}" data-n="${n}" onclick="pickNum(this)">${n}人</span>`).join('')}</div></div>
-    <div class="field"><label>给队友的话</label><input type="text" id="tNote" placeholder="例：新手友好，AA制，看完约饭"></div>
-    <button class="big-btn" onclick="doTeam(${actId})">发布队伍 🚀</button>`);
-}
-let _cap=3;
-function pickNum(el){document.querySelectorAll('#capChips .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');_cap=+el.dataset.n;}
-function doTeam(actId){
-  const a=ACTS.find(x=>x.id===actId);
-  const title=document.getElementById('tTitle').value.trim()||`${a.title.slice(0,10)}搭子群`;
-  const time=document.getElementById('tTime').value.trim()||'周六 10:00';
-  const meet=document.getElementById('tMeet').value.trim()||`${a.venue}正门`;
-  const note=document.getElementById('tNote').value.trim()||'来了就是队友';
-  store.teams.unshift({id:'t'+Date.now(),actId,title,time,meet,cap:_cap,members:[ME],note});
-  store.joined.push(store.teams[0].id);
-  save();closeSheet('maskForm');renderTeams();switchTab('team');toast('🎉 队伍已发布，等队友加入！');
-}
-
-/* ---------------- 通用 UI ---------------- */
-function openForm(html){document.getElementById('formBody').innerHTML=html;openSheet('maskForm');}
-function openSheet(id){document.getElementById(id).classList.add('on');document.body.style.overflow='hidden';}
-function closeSheet(id){document.getElementById(id).classList.remove('on');document.body.style.overflow='';}
-let _toastTimer;
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');clearTimeout(_toastTimer);_toastTimer=setTimeout(()=>t.classList.remove('on'),2200);}
-function switchTab(tab){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
-  document.getElementById('page-'+tab).classList.add('on');
-  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab));
-  document.getElementById('fab').style.display = (tab==='team'||tab==='guide')?'flex':'none';
-  window.scrollTo(0,0);
-}
-function onFab(){
-  const tab=document.querySelector('nav button.on').dataset.tab;
-  if(tab==='team')openCreateTeamBlank();
-  else openPublish();
-}
-function openCreateTeamBlank(){
-  openForm(`<div class="sheet-head"><h3>🤝 自由发起组队</h3><button class="close" onclick="closeSheet('maskForm')">✕</button></div>
-    <div class="field"><label>关联活动</label><select id="tAct">${ACTS.filter(a=>a.city===store.city).map(a=>`<option value="${a.id}">${a.title}</option>`).join('')}</select></div>
-    <div class="field"><label>队伍名称</label><input type="text" id="tTitle" placeholder="例：周末爬山小队"></div>
-    <div class="field"><label>集合时间</label><input type="text" id="tTime" placeholder="例：周日 09:00"></div>
-    <div class="field"><label>集合地点</label><input type="text" id="tMeet" placeholder="例：地铁站A口"></div>
-    <div class="field"><label>成团人数（含你）</label><div class="chips" id="capChips">${[2,3,4,6,8].map((n,i)=>`<span class="chip ${i===1?'on':''}" data-n="${n}" onclick="pickNum(this)">${n}人</span>`).join('')}</div></div>
-    <div class="field"><label>给队友的话</label><input type="text" id="tNote" placeholder="例：AA制，新手友好"></div>
-    <button class="big-btn" onclick="doTeam(+document.getElementById('tAct').value)">发布队伍 🚀</button>`);
-}
-function openCityPicker(){
-  openForm(`<div class="sheet-head"><h3>📍 选择城市</h3><button class="close" onclick="closeSheet('maskForm')">✕</button></div>
-    <div class="chips" style="gap:10px">${CITIES.map(c=>`<span class="chip ${c===store.city?'on':''}" style="padding:8px 20px;font-size:14px" onclick="setCity('${c}')">${c}</span>`).join('')}</div>
-    <p style="font-size:12px;color:var(--sub);margin-top:12px">雏形版已内置 5 城市示例数据，正式版将接入美团同城活动供给。</p>`);
-}
-function setCity(c){store.city=c;save();closeSheet('maskForm');renderAll();toast('已切换到 '+c);}
-
-/* ---------------- 偏好设置 ---------------- */
-function renderPrefs(){
-  document.getElementById('interestChips').innerHTML = INTERESTS.map(k=>`<span class="chip ${store.interests.includes(k)?'on':''}" onclick="toggleInterest('${k}',this)">${catEmoji(k)} ${CATS[k].name}</span>`).join('');
-  document.getElementById('crowdChips').innerHTML = CROWDS.map(c=>`<span class="chip ${store.crowd===c.id?'on':''}" onclick="setCrowd('${c.id}')">${c.emoji} ${c.name}</span>`).join('');
-  const r=document.getElementById('budgetRange');r.value=store.budget;
-  document.getElementById('budgetVal').textContent = store.budget>=500?'不设上限':'≤'+store.budget+'元';
-  document.getElementById('prefSummary').textContent = `已选${store.interests.length}类兴趣`;
-}
-function toggleInterest(k,el){
-  const i=store.interests.indexOf(k);
-  i>=0?store.interests.splice(i,1):store.interests.push(k);
-  el.classList.toggle('on');save();renderDiscover();
-}
-function setCrowd(c){store.crowd=c;save();renderPrefs();renderDiscover();}
-document.getElementById('budgetRange').addEventListener('input',e=>{
-  store.budget=+e.target.value;
-  document.getElementById('budgetVal').textContent = store.budget>=500?'不设上限':'≤'+store.budget+'元';
-});
-document.getElementById('budgetRange').addEventListener('change',()=>{save();renderDiscover();});
-document.querySelectorAll('.w-sim button').forEach(b=>b.onclick=()=>{
-  store.weather=b.dataset.w;save();renderWeather();renderDiscover();
-  toast(WEATHER_MAP[store.weather].tip);
-});
-
-/* ---------------- 产品说明 ---------------- */
-function openAbout(){
-  document.getElementById('aboutBody').innerHTML=`<div class="sheet-head"><h3>🧭 产品说明（面试官入口）</h3><button class="close" onclick="closeSheet('maskAbout')">✕</button></div>
-  <div class="pi-sec"><div class="pi-box"><b>一句话定位：</b>面向大学生的周末决策引擎 —— 把「去哪玩」从 30 分钟的刷帖纠结，变成 1 分钟的确定性出发。</div></div>
-  <div class="pi-sec"><h4>😤 用户与痛点</h4>
-    <ul><li><b>信息散</b>：展览/市集/演出/徒步分散在 5+ 个平台，大学生没有时间逐一比对</li>
-    <li><b>决策重</b>：同一个周末，不同天气、预算、人数下完全不同——没人帮他算这笔账</li>
-    <li><b>搭子难</b>：想去的活动找不到人一起；约好了又没人管集合</li>
-    <li><b>无沉淀</b>：玩过就忘，经验和攻略没法积累复用</li></ul></div>
-  <div class="pi-sec"><h4>🏗️ 产品功能架构</h4>
-    <div class="tree">周末出发 WeekendGO
-├─ 🧭 逛逛（决策层）
-│   ├─ 偏好输入：城市 / 兴趣 / 预算 / 同行人数
-│   ├─ 天气感知：模拟晴·多云·雨 → 推荐实时重排
-│   └─ 匹配度排序 = 兴趣35% + 天气25% + 预算20% + 同行20%
-├─ 🤝 组队（履约层）
-│   ├─ 组队大厅：加入 / 退出 / 满员状态
-│   └─ 从任意活动一键发起组队（集合时间·地点）
-├─ 📍 打卡（留存层）
-│   ├─ 心情 + 感想 + 花费 → 时间线沉淀
-│   └─ 统计面板：打卡次数 / 总花费 / 解锁去处
-└─ 📝 攻略（生态层）
-    ├─ 广场浏览 / 点赞 / 详情
-    └─ UGC 发布 → 反哺推荐内容供给</div></div>
-  <div class="pi-sec"><h4>🔁 推荐逻辑（雏形版）</h4>
-    <p>四维加权打分，透明可解释：每张卡片展示匹配度与推荐理由标签。天气是第一外生变量——雨天自动上浮「室内/雨天友好」活动并降权户外徒步；预算与同行人数做硬适配软排序。正式版将接入真实天气 API 与美团活动供给池。</p></div>
-  <div class="pi-sec"><h4>🚧 后续迭代</h4>
-    <ul><li>接入真实天气 API 与美团同城活动/门票供给</li><li>组队群聊与集合提醒（站内信）</li><li>打卡地图化：生成个人周末足迹热力图</li><li>攻略与活动挂载：看攻略直接买票/组队闭环</li></ul></div>
-  <p style="font-size:11px;color:var(--sub);text-align:center;margin-top:6px">雏形版本：数据为本地 Mock，交互逻辑均已真实可玩</p>`;
-  openSheet('maskAbout');
-}
-
-/* ---------------- 启动 ---------------- */
-function renderAll(){renderWeather();renderPrefs();renderDiscover();renderTeams();renderCheckins();renderGuides();}
-renderAll();
-const _hash=location.hash.slice(1);
-if(['team','checkin','guide'].includes(_hash))switchTab(_hash);
-setTimeout(()=>toast('💡 先试试右上角「模拟天气」切换，看推荐实时变化！'),900);
-</script>
+<script src="data.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
