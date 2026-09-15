@@ -260,7 +260,7 @@ const ACTS = [
   // 北京
   {id:1,city:'北京',cat:'exhibit',title:'「宇宙考古」沉浸式空间探索展',venue:'798艺术中心',area:'朝阳区·798',time:'周六周日 10:00-18:00',price:88,weatherFit:'rainy',crowd:['solo','duo','small'],desc:'联合国际空间机构打造的大型沉浸式展览，1200㎡ 星际场景，可预约讲解场，出片率极高。雨天/高温天的绝佳去处。'},
   {id:2,city:'北京',cat:'market',title:'伍德吃托克·秋季艺术市集',venue:'隆福文创园',area:'东城区·隆福寺',time:'周六至周日 11:00-21:00',price:35,weatherFit:'any',crowd:['duo','small','big'],desc:'100+ 独立创作者摊位，古着、黑胶、手作、精酿啤酒，傍晚有露天乐队演出。'},
-  {id:3,city:'北京',cat:'hike',title:'香山红叶 preparatory 徒步线',venue:'香山公园—碧云寺环线',area:'海淀区·香山',time:'周六 08:30 集合',price:10,weatherFit:'sunny',crowd:['solo','small','big'],desc:'经典入门徒步环线，全程约 8km / 3.5h，山顶可俯瞰北京城。领队负责带路和拍照，适合新手。'},
+  {id:3,city:'北京',cat:'hike',title:'香山红叶季·入门徒步线',venue:'香山公园—碧云寺环线',area:'海淀区·香山',time:'周六 08:30 集合',price:10,weatherFit:'sunny',crowd:['solo','small','big'],desc:'经典入门徒步环线，全程约 8km / 3.5h，山顶可俯瞰北京城。领队负责带路和拍照，适合新手。'},
   {id:4,city:'北京',cat:'show',title:'鼓浪音乐节·城市周末场',venue:'首钢园户外草坪',area:'石景山区·首钢园',time:'周六 14:00-22:00',price:180,weatherFit:'sunny',crowd:['duo','small','big'],desc:'独立乐队 + 电子舞台双舞台设置，日落场最出片，场内有创意餐车区。'},
   // 上海
   {id:5,city:'上海',cat:'exhibit',title:'teamLab 无界美术馆晨间场',venue:'teamLab无界 上海',area:'黄浦区·滨江',time:'周日 10:00-12:00 人少场',price:199,weatherFit:'rainy',crowd:['solo','duo'],desc:'晨间人少场，光影花海随意拍。提供和服租赁拍照服务，室内恒温，雨天无忧。'},
@@ -641,6 +641,8 @@ function openAbout(){
 /* ---------------- 启动 ---------------- */
 function renderAll(){renderWeather();renderPrefs();renderDiscover();renderTeams();renderCheckins();renderGuides();}
 renderAll();
+const _hash=location.hash.slice(1);
+if(['team','checkin','guide'].includes(_hash))switchTab(_hash);
 setTimeout(()=>toast('💡 先试试右上角「模拟天气」切换，看推荐实时变化！'),900);
 </script>
 </body>
