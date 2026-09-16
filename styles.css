@@ -58,10 +58,26 @@ main { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
 /* ---------- 周末 · 顶部 ---------- */
 .top { display: flex; justify-content: space-between; align-items: flex-start; padding: calc(14px + env(safe-area-inset-top)) 18px 0; background: var(--hero); transition: background .4s; }
 .brand-name { position: relative; display: inline-block; font-size: 20px; font-weight: 800; letter-spacing: 1px; }
+.brand-title { display: flex; align-items: center; gap: 7px; }
+.brand-icon { width: 28px; height: 28px; flex-shrink: 0; border-radius: 6px; }
 .brush { position: absolute; left: 40%; bottom: -5px; width: 62%; height: 8px; }
 .brand-sub { display: block; font-size: 12px; color: var(--sub); margin-top: 3px; letter-spacing: .5px; }
 .city { display: flex; align-items: center; gap: 4px; font-size: 16px; font-weight: 700; padding: 8px 0 8px 12px; min-height: 44px; }
 .city svg { width: 14px; height: 14px; }
+.top-actions { display: flex; align-items: flex-start; gap: 4px; flex-shrink: 0; }
+.music-button { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 44px; min-height: 48px; border-radius: 10px; color: var(--sub); }
+.music-button svg { width: 18px; height: 18px; }
+.music-button span { font-size: 11px; line-height: 1.5; }
+.music-button:hover { background: rgba(24, 63, 59, .06); color: var(--ink); }
+.music-button:active { background: rgba(24, 63, 59, .12); }
+.music-button[data-playing="true"] { color: var(--ink); background: #E2EFEB; }
+.music-global { position: fixed; top: calc(14px + env(safe-area-inset-top)); right: max(18px, calc((100vw - 430px) / 2 + 18px)); z-index: 2; background: var(--paper); }
+body[data-tab="weekend"] .music-global { display: none; }
+.share-preview { min-height: 160px; display: grid; place-items: center; margin: 16px 0; color: var(--sub); text-align: center; }
+.share-preview img { width: min(100%, 320px); height: auto; }
+.share-save { text-decoration: none; }
+.share-feedback { color: var(--sub); font-size: 13px; margin-top: 12px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 
 .hero { display: flex; justify-content: space-between; align-items: flex-end; gap: 6px; padding: 14px 16px 8px 18px; background: var(--hero); transition: background .4s; }
 .hero-text { min-width: 0; }
@@ -336,6 +352,19 @@ body[data-page-hidden="true"] .wx-particle { animation-play-state: paused; }
 .visits li span { color: var(--sub); text-align: right; }
 
 /* ---------- 组队 ---------- */
+.profile-heading { display: flex; align-items: center; gap: 12px; }
+.profile-avatar { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: rgba(119, 189, 178, .18); flex-shrink: 0; }
+.profile-avatar svg { width: 25px; height: 25px; }
+.profile-heading > div { min-width: 0; }
+.profile-heading b { font-size: 18px; overflow-wrap: anywhere; }
+.profile-heading p, .profile-note { font-size: 13px; color: var(--sub); overflow-wrap: anywhere; }
+.profile-note { margin: 12px 0; }
+.profile-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.demo-auth .field { margin-top: 14px; }
+.demo-auth .input::placeholder { color: var(--sub); opacity: 1; }
+.auth-links { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+.auth-links .link { min-height: 44px; }
+
 .team { margin: 0 16px 12px; background: var(--card); border-radius: 16px; padding: 14px 14px 12px; box-shadow: var(--shadow); }
 .team-top { display: flex; justify-content: space-between; gap: 10px; }
 .team h3 { font-size: 16px; line-height: 1.35; }

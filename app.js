@@ -1,5 +1,5 @@
 /* ================================================================
-   周末出发 WeekendGO · 页面状态与交互
+   周末拾光 · 页面状态与交互
    核心链路：看地图/推荐 → 地点卡 → 详情 → 主动确认到访 → 出票 → 我的收集
    点击地点只会选中，不会记为到访；伙伴位置只在主动打卡后移动
    ================================================================ */
@@ -13,7 +13,7 @@ const DEFAULTS = {
   city: '杭州', weather: 'sunny', weatherMotion: true,
   interests: ['walk', 'hike', 'exhibit', 'market'], budget: 200, crowd: 'solo',
   plan: [], tickets: [], collectSeen: {}, teams: null, joined: [],
-  buddy: { on: true, name: '橘子' }, buddyAt: {},
+  buddy: { on: true, name: '橘子' }, buddyAt: {}, demoProfile: null,
 };
 const S = (() => {
   try { return { ...DEFAULTS, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; }
@@ -257,7 +257,19 @@ function renderCollectBadge() {
 function renderMe() {
   const on = S.buddy.on;
   const ints = S.interests.map(k => CATS[k]?.name).filter(Boolean).join('、') || '未选择';
+  const profile = S.demoProfile;
   $('#meBody').innerHTML = `
+    <section class="me-card" aria-label="演示身份">
+      <div class="profile-heading">
+        <span class="profile-avatar" aria-hidden="true"><svg><use href="#i-me"/></svg></span>
+        <div><b>${profile ? esc(profile.nickname) : '你好，拾光旅人'}</b>
+          <p>${profile ? '已登录 · 本机演示身份' : '游客模式 · 自在探索，无需登录'}</p></div>
+      </div>
+      <p class="profile-note">${profile ? `${esc(profile.email)}<br>票根和计划仍保存在当前浏览器，不会云端同步。` : '用一个演示身份，体验你的拾光档案。游客也能计划、打卡和收集。'}</p>
+      <div class="profile-actions">${profile
+        ? '<button class="btn ghost" data-act="demoLogout">退出登录</button>'
+        : '<button class="btn primary" data-act="demoAuth" data-id="login">登录</button><button class="btn ghost" data-act="demoAuth" data-id="register">注册</button>'}</div>
+    </section>
     <section class="me-card">
       <h3>出游伙伴<button class="switch" role="switch" aria-checked="${on}" aria-label="显示出游伙伴" data-act="toggleBuddy"></button></h3>
       <div class="buddy-row${on ? '' : ' off'}">
@@ -290,6 +302,42 @@ function renderMe() {
   });
 }
 
+/* 仅演示身份切换：密码只做表单校验，不保存、不上传、不验证真实账号。 */
+function openDemoAuth(mode = 'login') {
+  const register = mode === 'register';
+  openSheet(`
+    <h2>${register ? '认识一下，拾光旅人' : '欢迎回到周末拾光'}</h2>
+    <p class="lead">${register ? '创建一个本机演示身份，继续收集周末。' : '登录你的演示身份，继续这段小旅行。'}</p>
+    <p class="honest" id="authNotice">功能演示，不验证真实账号。请勿输入真实密码。填写格式正确的演示邮箱与至少 6 位测试密码即可体验；密码不保存、不发送。记录仅保存在你正在使用的浏览器中，不会上传。仅在同一浏览器内切换演示身份时，票根和计划保持不变。</p>
+    <form id="demoAuthForm" class="demo-auth" aria-describedby="authNotice" autocomplete="off">
+      ${register ? '<div class="field"><label for="authNickname">怎么称呼你</label><input class="input" id="authNickname" maxlength="12" required placeholder="例如：周末散步员" autocomplete="off"></div>' : ''}
+      <div class="field"><label for="authEmail">演示邮箱</label><input class="input" id="authEmail" type="email" maxlength="100" required placeholder="traveler@example.com" autocomplete="off" autocapitalize="none" spellcheck="false"></div>
+      <div class="field"><label for="authPassword">测试密码（至少 6 位）</label><input class="input" id="authPassword" type="password" minlength="6" maxlength="72" required placeholder="请勿使用真实密码" autocomplete="new-password"></div>
+      <div class="d-actions"><button class="btn primary wide" type="submit">${register ? '注册并进入（演示）' : '登录（演示）'}</button></div>
+    </form>
+    <div class="auth-links"><button class="link" data-act="demoAuth" data-id="${register ? 'login' : 'register'}">${register ? '已有演示身份？登录' : '还没试过？注册'}</button>
+      <button class="link" data-act="close">以游客身份继续</button></div>`, register ? '模拟注册' : '模拟登录');
+  const form = $('#demoAuthForm');
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const nickname = $('#authNickname');
+    if (nickname) {
+      nickname.setCustomValidity(nickname.value.trim() ? '' : '请填写一个昵称');
+      nickname.oninput = () => nickname.setCustomValidity('');
+    }
+    if (!form.reportValidity()) return;
+    const email = $('#authEmail').value.trim().toLowerCase();
+    const previousName = S.demoProfile?.email === email ? S.demoProfile.nickname : null;
+    S.demoProfile = { email, nickname: nickname ? nickname.value.trim() : previousName || email.split('@')[0].slice(0, 12) };
+    // 清空密码后才保存身份，存储对象从不包含密码字段。
+    $('#authPassword').value = '';
+    let persisted = true;
+    try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { persisted = false; }
+    closeSheet(); renderMe();
+    toast(persisted ? '已进入演示身份，原有票根和计划都还在' : '已进入演示身份；浏览器禁用存储，本次关闭后不保留');
+  });
+}
+
 function renderAll() {
   renderHeader(); renderScene(); renderSpot(); renderPlan(); renderRecs();
   renderTeams(); renderCollect(); renderMe();
@@ -298,6 +346,7 @@ function renderAll() {
 /* ---------------- 底部面板 ---------------- */
 let lastFocus = null;
 function openSheet(html, label) {
+  window.disposeTicketShare?.();
   lastFocus = document.activeElement;
   const sheet = $('#sheet');
   sheet.innerHTML = `<div class="grip"></div><button class="sheet-close" data-act="close" aria-label="关闭"><svg><use href="#i-close"/></svg></button>${html}`;
@@ -308,6 +357,9 @@ function openSheet(html, label) {
   sheet.querySelector('.sheet-close').focus({ preventScroll: true });
 }
 function closeSheet() {
+  window.disposeTicketShare?.();
+  const password = $('#authPassword');
+  if (password) password.value = '';
   $('#mask').hidden = true;
   document.body.style.overflow = '';
   lastFocus?.focus?.({ preventScroll: true });
@@ -450,7 +502,7 @@ function openTicket(id) {
   openSheet(`${ticketHTML(t)}
     <div class="d-sec visits"><h4>到访记录 · ${t.visits.length} 次</h4><ul>${rows}</ul></div>
     <p class="d-hint">票根保存打卡当时的天气与伙伴，之后切换天气或伙伴不会改变它。</p>
-    <div class="d-actions"><button class="btn ghost wide" data-act="detail" data-id="${t.actId}">查看这个地点</button></div>`, '票根');
+    <div class="d-actions"><button class="btn ghost" data-act="detail" data-id="${t.actId}">查看地点</button><button class="btn primary" data-act="shareTicket" data-id="${t.actId}">分享票根</button></div>`, '票根');
 }
 
 /* ---------------- 组队 ---------------- */
@@ -531,7 +583,7 @@ function savePref() {
   toast('已按新的偏好重新推荐');
 }
 function openAbout() {
-  openSheet(`<div class="about"><h2>周末出发 WeekendGO</h2>
+  openSheet(`<div class="about"><h2>周末拾光</h2>
     <p class="lead">帮大学生找到这周末去哪，并把每一次城市探索变成一张可以收藏的票根。</p>
     <h4>核心链路</h4>
     <div class="flow"><span>感到周末临近</span><i>→</i><span>3 个明确推荐</span><i>→</i><span>地点详情</span><i>→</i><span>加入计划</span><i>→</i><span>主动确认到访</span><i>→</i><span>地点票根</span><i>→</i><span>我的收集</span></div>
@@ -553,7 +605,7 @@ function openDataNote() {
     <li>WeekendGO 不读取定位。</li></ul></div>`, '数据说明');
 }
 function resetData() {
-  if (!confirm('清空本机的偏好、计划、打卡与票根？此操作无法撤销。')) return;
+  if (!confirm('清空本机的演示身份、偏好、计划、打卡与票根？此操作无法撤销。')) return;
   try { localStorage.removeItem(KEY); } catch { /* ignore */ }
   location.reload();
 }
@@ -562,6 +614,7 @@ function resetData() {
 const TABS = ['weekend', 'team', 'collect', 'me'];
 function switchTab(tab) {
   if (!TABS.includes(tab)) tab = 'weekend';
+  document.body.dataset.tab = tab;
   if (tab === 'collect') {
     S.collectSeen = Object.fromEntries(S.tickets.map(t => [t.actId, t.visits.length]));
     save();
@@ -587,12 +640,15 @@ function toast(msg) {
 
 /* ---------------- 事件委托 ---------------- */
 const ACTIONS = {
+  demoAuth: mode => openDemoAuth(mode),
+  demoLogout: () => { S.demoProfile = null; save(); renderMe(); toast('已退出，回到游客模式；票根和计划已保留'); },
   pick: id => { sel = +id; userPicked = true; renderScene(); renderSpot(); },
   detail: id => openDetail(id),
   plan: id => togglePlan(id),
   checkin: id => openCheckin(id),
   confirm: id => confirmCheckin(id),
   ticket: id => openTicket(id),
+  shareTicket: id => window.openTicketShare(id),
   close: () => closeSheet(),
   closeReveal: () => closeReveal(),
   goCollect: () => { closeReveal(); switchTab('collect'); },

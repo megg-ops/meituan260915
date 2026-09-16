@@ -1,1 +1,6 @@
-DOCS/
+DOCS/*
+!DOCS/PRD.md
+!DOCS/VISUAL-SPEC.md
+.impeccable/
+assets/拾光_no-watermark.mp3
+assets/*:Zone.Identifier
