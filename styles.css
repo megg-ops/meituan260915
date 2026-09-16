@@ -101,22 +101,28 @@ body[data-weather="cloudy"] .wx-layer { background:
   linear-gradient(to bottom, rgba(214, 226, 226, .35), transparent 50%);
   animation: drift 18s ease-in-out infinite alternate; }
 @keyframes drift { to { background-position: 30px 0, -24px 0, 0 0; } }
-body[data-weather="rain"] .wx-layer { background:
-  repeating-linear-gradient(104deg, transparent 0 22px, rgba(234, 244, 250, .55) 22px 23.5px, transparent 23.5px 44px),
-  linear-gradient(to bottom, rgba(96, 140, 172, .28), rgba(96, 140, 172, .08));
-  background-size: 70px 90px, 100% 100%;
-  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 55%, transparent 90%);
-  mask-image: linear-gradient(to bottom, #000 0, #000 55%, transparent 90%);
-  animation: rainfall .7s linear infinite; }
-@keyframes rainfall { to { background-position: -22px 90px, 0 0; } }
-body[data-weather="snow"] .wx-layer { background:
-  radial-gradient(circle, rgba(255, 255, 255, .95) 0 2px, transparent 2.6px),
-  radial-gradient(circle, rgba(255, 255, 255, .8) 0 1.4px, transparent 2px),
-  linear-gradient(to bottom, rgba(236, 242, 246, .45), rgba(236, 242, 246, .15));
-  background-size: 64px 64px, 38px 38px, 100% 100%;
-  background-position: 0 0, 17px 11px, 0 0;
-  animation: snowfall 7s linear infinite; }
-@keyframes snowfall { to { background-position: 16px 64px, 3px 49px, 0 0; } }
+body[data-weather="rain"] .wx-layer { background: linear-gradient(to bottom, rgba(96, 140, 172, .16), transparent 75%); }
+body[data-weather="snow"] .wx-layer { background: linear-gradient(to bottom, rgba(236, 242, 246, .26), transparent 80%); }
+.wx-layer { overflow: hidden; }
+.wx-particle { position: absolute; left: var(--x); top: -20px; pointer-events: none; opacity: 0;
+  animation: precipitation var(--duration) linear var(--delay) infinite; }
+body[data-weather="rain"] .wx-particle { width: 1px; height: var(--size); border-radius: 50%;
+  background: linear-gradient(transparent, rgba(233, 247, 255, .9)); }
+body[data-weather="snow"] .wx-particle { width: var(--size); height: var(--size); border-radius: 50%;
+  background: radial-gradient(circle, #fff 25%, rgba(255, 255, 255, .25) 65%, transparent 75%);
+  animation-timing-function: ease-in-out; }
+@keyframes precipitation {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  12%, 80% { opacity: var(--alpha); }
+  100% { transform: translate3d(var(--drift), 620px, 0); opacity: 0; }
+}
+body[data-weather-motion="false"] .wx-layer,
+body[data-weather-motion="false"] .wx-ico { animation: none !important; }
+body[data-weather-motion="false"] .wx-particle { display: none; }
+body[data-weather-motion="false"] .wx-particle,
+body[data-page-hidden="true"] .wx-layer,
+body[data-page-hidden="true"] .wx-ico,
+body[data-page-hidden="true"] .wx-particle { animation-play-state: paused; }
 
 .map-note { position: absolute; right: 12px; top: 14px; font-size: 11px; color: var(--sub); background: rgba(250, 251, 249, .82); padding: 2px 8px; border-radius: 6px; pointer-events: none; }
 .wx-off { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); background: rgba(250, 251, 249, .92); padding: 6px 12px; border-radius: 8px; font-size: 13px; color: var(--sub); pointer-events: none; }
@@ -164,7 +170,7 @@ body[data-weather="snow"] .wx-layer { background:
 
 /* 插画缩略：地点专属插画 / 示意图局部 / 通用画面 */
 .art { background-color: #DCEBE5; background-size: cover; background-position: center; position: relative; overflow: hidden; flex-shrink: 0; }
-.art.from-map { background-image: url("assets/map-hangzhou-sunny-v1.jpg"); background-size: 330%; }
+.art.from-map { background-size: 330%; }
 .art.generic { background-image: none; }
 .art.generic svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 
@@ -382,4 +388,5 @@ body[data-weather="snow"] .wx-layer { background:
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
   .wx-layer { animation: none !important; }
+  .wx-particle { display: none; }
 }

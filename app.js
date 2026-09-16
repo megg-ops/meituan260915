@@ -10,9 +10,9 @@ const pad = n => String(n).padStart(2, '0');
 /* ---------------- 状态（localStorage 键 wg2，与旧版数据隔离） ---------------- */
 const KEY = 'wg2';
 const DEFAULTS = {
-  city: '杭州', weather: 'sunny',
+  city: '杭州', weather: 'sunny', weatherMotion: true,
   interests: ['walk', 'hike', 'exhibit', 'market'], budget: 200, crowd: 'solo',
-  plan: [], tickets: [], teams: null, joined: [],
+  plan: [], tickets: [], collectSeen: {}, teams: null, joined: [],
   buddy: { on: true, name: '橘子' }, buddyAt: {},
 };
 const S = (() => {
@@ -27,14 +27,18 @@ let sel = null;         // 地图上选中的地点，仅界面状态
 let userPicked = false; // 选中来自用户点击还是默认推荐
 let showAll = false;
 
-/* 城市探索示意图：只有杭州完成首轮插画 */
+/* 城市探索示意图：艺术化位置，不代表真实地理坐标 */
 const MAPS = {
   杭州: { img: 'assets/map-hangzhou-sunny-v1.jpg', alt: '杭州周末探索示意图：山间步道、西湖、校园周边与街区', home: { x: 46, y: 40 } },
+  北京: { img: 'assets/map-beijing-v1.jpg', alt: '北京探索示意图：香山、798、隆福寺与首钢园', home: { x: 48, y: 47 } },
+  上海: { img: 'assets/map-shanghai-v1.jpg', alt: '上海探索示意图：苏州河、滨江美术馆、永康路与安义夜巷', home: { x: 35, y: 55 } },
+  广州: { img: 'assets/map-guangzhou-v1.jpg', alt: '广州探索示意图：火炉山、广东省博物馆与珠江江畔', home: { x: 30, y: 57 } },
+  深圳: { img: 'assets/map-shenzhen-v1.jpg', alt: '深圳探索示意图：华侨城、海上世界与梧桐山', home: { x: 22, y: 49 } },
 };
 /* 伙伴在各地点旁的位置（示意图百分比），落在岸上或路上 */
 const BUDDY_SPOTS = { 18: { x: 17, y: 67 }, 15: { x: 13, y: 38 }, 19: { x: 58, y: 34 }, 17: { x: 72, y: 70 } };
 
-const CAT_IMG = { idle: 'assets/companion-cat-idle-v1.png', happy: 'assets/companion-cat-happy-v1.png' };
+const CAT_IMG = { idle: 'assets/companion-cat-idle-v2.png', happy: 'assets/companion-cat-happy-v1.png' };
 const WX_WORD = { sunny: '晴天', cloudy: '多云', rain: '雨天', snow: '雪天', unknown: '天气未记录' };
 const CROWD_WORD = { solo: '独自出发', duo: '两人同行', small: '3-5人同行', big: '大部队出发' };
 
@@ -85,12 +89,12 @@ const ranked = () => ACTS.filter(a => a.city === S.city).map(a => ({ a, s: score
 /* ---------------- 插画：专属插画 / 示意图局部 / 通用画面 ---------------- */
 function artOf(a) {
   if (a.art) return { type: 'img', src: a.art };
-  if (a.place && MAPS[a.city]) return { type: 'map', x: a.place.x, y: a.place.y };
+  if (a.place && MAPS[a.city]) return { type: 'map', src: MAPS[a.city].img, x: a.place.x, y: a.place.y };
   return { type: 'generic', cat: a.cat };
 }
 function artHTML(art, cls = '') {
   if (art.type === 'img') return `<div class="art ${cls}" style="background-image:url('${art.src}')"></div>`;
-  if (art.type === 'map') return `<div class="art from-map ${cls}" style="background-position:${art.x}% ${art.y}%"></div>`;
+  if (art.type === 'map') return `<div class="art from-map ${cls}" style="background-image:url('${art.src || MAPS['杭州'].img}');background-position:${art.x}% ${art.y}%"></div>`;
   const hue = { walk: '#77BDB2', hike: '#417C65', exhibit: '#8FAFC2', market: '#DDA46B', cafe: '#BD9A78', show: '#D08C78', night: '#5B7FA0' }[art.cat] || '#77BDB2';
   return `<div class="art generic ${cls}"><svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="100" height="100" fill="#EEF2EA"/><circle cx="71" cy="30" r="11" fill="#EDC777" opacity=".9"/><path d="M0 68Q24 48 50 61T100 55V100H0z" fill="${hue}" opacity=".5"/><path d="M0 82Q30 66 60 78T100 73V100H0z" fill="${hue}"/></svg></div>`;
 }
@@ -105,9 +109,21 @@ function renderHeader() {
   $('#cityLabel').textContent = S.city;
   const w = WEATHERS[S.weather];
   document.body.dataset.weather = S.weather;
+  document.body.dataset.weatherMotion = String(S.weatherMotion);
   $('#wxIcon').innerHTML = `<use href="#i-${S.weather}"/>`;
   $('#wxNow').textContent = `当前天气 · ${w.name}`;
   $('#wxTemp').textContent = w.temp === null ? '--' : `${w.temp}°C`;
+}
+
+/* 有限数量、固定错峰；重新选地点也不会随机闪烁。 */
+function weatherParticles() {
+  if (!['rain', 'snow'].includes(S.weather)) return '';
+  const rain = S.weather === 'rain', count = rain ? 14 : 12;
+  return Array.from({ length: count }, (_, i) => {
+    const duration = rain ? 1.8 + (i % 4) * .3 : 10 + (i % 5) * 1.5;
+    const size = rain ? 10 + i % 4 * 2 : 2 + i % 3;
+    return `<i class="wx-particle" style="--x:${4 + i * 71 % 92}%;--size:${size}px;--duration:${duration}s;--delay:${-(i * 1.73 % duration).toFixed(2)}s;--drift:${rain ? -35 : (i % 2 ? 22 : -18)}px;--alpha:${rain ? .25 + i % 3 * .08 : .45 + i % 3 * .15}"></i>`;
+  }).join('');
 }
 
 function renderScene() {
@@ -127,14 +143,15 @@ function renderScene() {
   let buddy = '';
   if (S.buddy.on) {
     const at = S.buddyAt[S.city];
-    const p = (at && BUDDY_SPOTS[at]) || map.home;
+    const place = act(at)?.place;
+    const p = (at && BUDDY_SPOTS[at]) || (place && { x: place.x + 8, y: place.y + 10 }) || map.home;
     const solo = S.crowd === 'solo';
     buddy = `<img class="buddy${solo ? ' solo' : ''}" src="${CAT_IMG.idle}" alt="" style="left:${p.x}%;top:${p.y}%">
       ${solo ? `<span class="buddy-name" style="left:${p.x}%;top:${p.y}%">${esc(S.buddy.name)}</span>` : ''}`;
   }
   scene.innerHTML = `<div class="map-crop"><div class="map-inner">
       <img class="map-img" src="${map.img}" alt="${esc(map.alt)}">
-      <div class="wx-layer"></div>${buddy}${pins}
+      <div class="wx-layer" aria-hidden="true">${weatherParticles()}</div>${buddy}${pins}
     </div>
     ${S.weather === 'unknown' ? '<span class="wx-off">天气暂不可用</span>' : ''}
     <span class="map-note">探索示意图 · 位置不精确</span></div>`;
@@ -223,9 +240,17 @@ function renderCollect() {
       <b>${esc(t.place)}</b><small>${esc(t.city)} · ${d.getMonth() + 1}月${d.getDate()}日</small></button>`;
   }).join('')}</div>` : `<div class="empty"><img src="${CAT_IMG.idle}" alt=""><b>还没有票根</b><p>去一个地方，回来主动确认到访，<br>就能收下第一张。</p><button class="btn primary" data-act="tab" data-id="weekend">去找周末去处</button></div>`;
   $('#collectBody').innerHTML = shelf + lockedHTML;
+  renderCollectBadge();
+}
+
+function renderCollectBadge() {
+  const unread = S.tickets.filter(t => t.visits.length > (S.collectSeen?.[t.actId] || 0)).length;
   const badge = document.querySelector('[data-tab="collect"] .badge');
-  if (ts.length && !badge) document.querySelector('[data-tab="collect"]').insertAdjacentHTML('beforeend', `<span class="badge">${ts.length}</span>`);
-  else if (badge) ts.length ? (badge.textContent = ts.length) : badge.remove();
+  if (unread && !badge) document.querySelector('[data-tab="collect"]').insertAdjacentHTML('beforeend', `<span class="badge" aria-label="${unread} 张票根有新记录">${unread}</span>`);
+  else if (badge) {
+    if (!unread) badge.remove();
+    else { badge.textContent = unread; badge.setAttribute('aria-label', `${unread} 张票根有新记录`); }
+  }
 }
 
 /* ---------------- 渲染：我的 ---------------- */
@@ -352,7 +377,7 @@ function confirmCheckin(id) {
   const visit = {
     ts: Date.now(), weather: S.weather, crowd,
     note: $('#ciNote').value.trim(), cost: Math.max(0, parseInt($('#ciCost').value, 10) || 0),
-    buddy: S.buddy.on ? { name: S.buddy.name } : null,   // 伙伴外观与名字作为快照保存
+    buddy: S.buddy.on ? { name: S.buddy.name, img: CAT_IMG.idle } : null,   // 新记录保存素材版本，旧票根沿用旧姿态
   };
   let t = ticketOf(id);
   const repeat = !!t;
@@ -390,7 +415,7 @@ function ticketHTML(t, idx = t.visits.length - 1) {
     <p class="t-note">${esc(v.note)}</p>
     <div class="t-cut"></div>
     <footer class="t-foot"><div><b>${date} ${pad(d.getHours())}:${pad(d.getMinutes())}</b><span>${WX_WORD[v.weather] || ''} · ${CROWD_WORD[v.crowd] || ''}${nth}</span></div>
-      ${v.buddy ? `<img src="${CAT_IMG.idle}" alt="伙伴${esc(v.buddy.name)}">` : ''}</footer>
+      ${v.buddy ? `<img src="${v.buddy.img || 'assets/companion-cat-idle-v1.png'}" alt="伙伴${esc(v.buddy.name)}">` : ''}</footer>
     <p class="t-no">— 第 ${t.no} 张周末票根 · No.${String(t.no).padStart(4, '0')} —</p>
   </article></div>`;
 }
@@ -468,6 +493,7 @@ function openWeather() {
   openSheet(`<h2>天气演示</h2>
     <p class="lead">真实天气尚未接入。这里切换的是「${esc(S.city)}此刻天气」的演示，界面氛围和推荐排序会跟着变。</p>
     <div class="wx-grid">${Object.entries(WEATHERS).map(([k, w]) => `<button class="${k === S.weather ? 'on' : ''}" data-act="setWx" data-id="${k}" aria-pressed="${k === S.weather}"><svg><use href="#i-${k}"/></svg>${w.name === '暂不可用' ? '未知' : w.name}</button>`).join('')}</div>
+    <button class="me-row" data-act="toggleWeatherMotion" aria-pressed="${S.weatherMotion}">天气动态效果<span>${S.weatherMotion ? '已开启' : '已关闭'}</span></button>
     <p class="honest"><span>出行日天气接入后会单独标注日期与来源，不会用此刻天气冒充预报。已生成的票根保留打卡时的天气。</span></p>`, '天气演示');
 }
 function setWeather(k) {
@@ -477,7 +503,7 @@ function setWeather(k) {
   toast(WEATHERS[k].tip);
 }
 function openCity() {
-  openSheet(`<h2>选择城市</h2><p class="lead">杭州是首轮插画样例；其他城市示意图绘制中，推荐与打卡照常可用。</p>
+  openSheet(`<h2>选择城市</h2><p class="lead">五座城市，五幅手绘探索示意图。位置为艺术化表达，不提供导航。</p>
     <div class="seg" style="margin-top:14px">${CITIES.map(c => `<button class="${c === S.city ? 'on' : ''}" data-act="setCity" data-id="${c}">${c}</button>`).join('')}</div>`, '选择城市');
 }
 function setCity(c) {
@@ -518,7 +544,7 @@ function openAbout() {
     <h4>数据真实性</h4>
     <ul><li>真实：本地日期、你输入的偏好与打卡内容。</li><li>演示：天气、活动、队伍成员、攻略点赞。</li><li>地图是探索示意图，位置不精确，不提供导航。</li></ul>
     <h4>下一步</h4>
-    <ul><li>更多城市示意图与地点票根插画</li><li>接入真实天气与出行日预报</li><li>高校身份与同校组队（候选）</li><li>票根分享图</li></ul></div>`, '产品说明');
+    <ul><li>更多地点专属票根插画（现有五城地图可用作取景）</li><li>接入真实天气与出行日预报</li><li>高校身份与同校组队（候选）</li><li>票根分享图</li></ul></div>`, '产品说明');
 }
 function openDataNote() {
   openSheet(`<div class="about"><h2>数据说明</h2>
@@ -536,6 +562,11 @@ function resetData() {
 const TABS = ['weekend', 'team', 'collect', 'me'];
 function switchTab(tab) {
   if (!TABS.includes(tab)) tab = 'weekend';
+  if (tab === 'collect') {
+    S.collectSeen = Object.fromEntries(S.tickets.map(t => [t.actId, t.visits.length]));
+    save();
+    renderCollectBadge();
+  }
   document.querySelectorAll('.page').forEach(p => p.classList.toggle('on', p.id === 'page-' + tab));
   document.querySelectorAll('.tabbar button').forEach(b => {
     b.classList.toggle('on', b.dataset.tab === tab);
@@ -573,6 +604,7 @@ const ACTIONS = {
   city: () => openCity(),
   setCity: c => setCity(c),
   setWx: k => setWeather(k),
+  toggleWeatherMotion: () => { S.weatherMotion = !S.weatherMotion; save(); renderHeader(); openWeather(); },
   pref: () => openPref(),
   savePref: () => savePref(),
   about: () => openAbout(),
@@ -612,3 +644,4 @@ const LEGACY = { checkin: 'collect', guide: 'weekend' };
 const routeFromHash = () => { const h = location.hash.slice(1); if (h) switchTab(LEGACY[h] || h); };
 routeFromHash();
 window.addEventListener('hashchange', routeFromHash);
+document.addEventListener('visibilitychange', () => { document.body.dataset.pageHidden = String(document.hidden); });
